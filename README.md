@@ -1,1 +1,2 @@
-# ads-banking-project-springboot
+# Banking API - Clean Architecture
+Banking API - Clean Architecture

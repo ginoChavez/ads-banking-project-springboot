@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="banking.transfers.domain.entity">
+	<class name="Transfer" table="transfer">
+        <id name="id" column="transfer_id">
+            <generator class="native"/>
+        </id>
+        <property name="numberAccountOrigin" column="number_account_origin" />
+        <property name="numberAccountDestiny" column="number_account_destiny" />
+        <property name="dateRegistry" column="date_registry" />
+        <property name="amount" column="amount" />
+        <property name="transferType" column="transfer_type" />
+        <many-to-one name="person" class="banking.persons.domain.entity.Person" column="person_id" not-null="true"/>
+    </class> 
+</hibernate-mapping>

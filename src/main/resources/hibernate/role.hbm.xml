@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="banking.roles.domain.entity">
+	<class name="Role" table="role">
+        <id name="id" column="role_id">
+            <generator class="native"/>
+        </id>
+        <property name="name" column="role_name" />
+        <set name="users" inverse="true" cascade="all">
+            <key column="role_id" not-null="true"/>
+            <one-to-many class="banking.users.domain.entity.User"/>
+        </set>
+        <set name="claims" inverse="true" cascade="all">
+            <key column="role_id" not-null="true"/>
+            <one-to-many class="banking.roles.domain.entity.RoleClaim"/>
+        </set>
+    </class> 
+</hibernate-mapping>
