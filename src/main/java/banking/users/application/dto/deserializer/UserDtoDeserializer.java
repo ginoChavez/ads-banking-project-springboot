@@ -23,9 +23,9 @@ public class UserDtoDeserializer extends JsonDeserializer<UserDto> {
 		UserDto userDto = null;
 		try {
     		ObjectCodec objectCodec = jsonParser.getCodec();
+    		PersonDto person = null;
             JsonNode node = objectCodec.readTree(jsonParser);
             JsonNode nodePerson = node.get("person");
-            PersonDto person = null;
             if(nodePerson!=null) {
             	person = new PersonDto(nodePerson.get("firstName").asText(), 
             			nodePerson.get("lastName").asText(),
@@ -34,6 +34,7 @@ public class UserDtoDeserializer extends JsonDeserializer<UserDto> {
             			nodePerson.get("phone").asText(),
             			nodePerson.get("email")==null?"":nodePerson.get("email").asText());
             }
+            
             JsonNode nodeRole = node.get("role");
             RoleDto role = null;
             if(nodeRole!=null) {

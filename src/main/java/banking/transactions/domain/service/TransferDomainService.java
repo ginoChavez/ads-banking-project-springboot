@@ -20,15 +20,15 @@ public class TransferDomainService {
 		destinationAccount.depositMoney(amount);
 	}
 	
-	public void performTransferByType(BankAccount account, BigDecimal amount, String type)
+	public void performTransferByType(BankAccount account, BigDecimal amount, Boolean isDeposit)
 			throws IllegalArgumentException {
 		/*Notification notification = this.validation(originAccount, destinationAccount, amount);
         if (notification.hasErrors()) {
             throw new IllegalArgumentException(notification.errorMessage());
         }*/
-		if(Objects.deepEquals(type, "D")) {
+		if(isDeposit) {
 			account.depositMoney(amount);
-		}else if(Objects.deepEquals(type, "R")) {
+		}else {
 			account.withdrawMoney(amount);
 		}
 	}

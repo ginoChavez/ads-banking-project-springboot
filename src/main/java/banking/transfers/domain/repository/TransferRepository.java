@@ -10,4 +10,5 @@ public interface TransferRepository {
 	public Transfer findById(long id);
 	public List<Transfer> getPaginated(int page, int pageSize);
 	public Transfer save(Transfer transfer);
+	public Transfer update(Transfer transfer);
 }

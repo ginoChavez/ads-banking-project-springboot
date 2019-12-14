@@ -1,6 +1,7 @@
 package banking.accounts.infrastructure.hibernate.repository;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Criteria;
@@ -25,25 +26,19 @@ public class BankAccountHibernateRepository extends BaseHibernateRepository<Bank
 		BankAccount bankAccount = null;
 		Session session = sessionFactory.getCurrentSession();
 		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
-				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active " + 
+				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
 				"from bank_account a " + 
 				"inner join person p on a.person_id = a.person_id "
 				+ "where a.number = ?");
 		List<Object[]> rows = query.setString(0, accountNumber).list();
-		//BankAccount bankAccount = null;
 		if(!rows.isEmpty()) {
 			Person person = null;
 			Object[] row = rows.get(0);
-			bankAccount = new BankAccount(Long.valueOf(row[0].toString()), (String) row[1], (BigDecimal) row[2]);
+			bankAccount = new BankAccount(Long.valueOf(row[0].toString()), (String) row[1], (BigDecimal) row[2], (Boolean)row[11], (BigDecimal) row[12]);
 			person = new Person(Long.valueOf(row[3].toString()), (String) row[4], (String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9], (Boolean)row[10]);
 			bankAccount.setPerson(person);
 		}
 		return bankAccount;
-		/*BankAccount bankAccount = null;
-		Criteria criteria = getSession().createCriteria(BankAccount.class);
-		criteria.add(Restrictions.eq("number", accountNumber));
-		bankAccount = (BankAccount) criteria.uniqueResult();
-		return bankAccount;*/
 	}
 
 	@Override
@@ -59,11 +54,50 @@ public class BankAccountHibernateRepository extends BaseHibernateRepository<Bank
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<BankAccount> get(long personId) {
-		List<BankAccount> bankAccounts = null;
-		Criteria criteria = getSession().createCriteria(BankAccount.class, "a");
-		criteria.createAlias("a.person", "c");
-		criteria.add(Restrictions.eq("c.id", personId));
-		bankAccounts = criteria.list();
+		List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
+				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
+				"from bank_account a " + 
+				"inner join person p on a.person_id = a.person_id "
+				+ "where p.person_id = ?");
+		List<Object[]> rows = query.setLong(0, personId).list();
+		BankAccount bankAccount = null;
+		if(!rows.isEmpty()) {
+			for(Object[] row: rows) {
+				Person person = null;
+				bankAccount = new BankAccount(Long.valueOf(row[0].toString()), (String) row[1], (BigDecimal) row[2], (Boolean)row[11], (BigDecimal) row[12]);
+				person = new Person(Long.valueOf(row[3].toString()), (String) row[4], (String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9], (Boolean)row[10]);
+				bankAccount.setPerson(person);
+				bankAccounts.add(bankAccount);
+			}
+		}
+		return bankAccounts;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<BankAccount> getPaginated(int page, int pageSize,long personId) {
+		List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
+				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
+				"from bank_account a " + 
+				"inner join person p on a.person_id = a.person_id "
+				+ "where p.person_id = ?");
+		query.setFirstResult(page);
+		query.setMaxResults(pageSize);
+		List<Object[]> rows = query.setLong(0, personId).list();
+		BankAccount bankAccount = null;
+		if(!rows.isEmpty()) {
+			for(Object[] row: rows) {
+				Person person = null;
+				bankAccount = new BankAccount(Long.valueOf(row[0].toString()), (String) row[1], (BigDecimal) row[2], (Boolean)row[11], (BigDecimal) row[12]);
+				person = new Person(Long.valueOf(row[3].toString()), (String) row[4], (String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9], (Boolean)row[10]);
+				bankAccount.setPerson(person);
+				bankAccounts.add(bankAccount);
+			}
+		}
 		return bankAccounts;
 	}
 	

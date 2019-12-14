@@ -6,6 +6,7 @@ import banking.roles.domain.entity.Role;
 
 public interface RoleRepository {
 	public Role save(Role role);
-	public List<Role> get(int page, int pageSize);
-	public Role get(long roleId);
+	public List<Role> getPaginated(int page, int pageSize);
+	public List<Role> getAll();
+	public Role getById(long roleId);
 }

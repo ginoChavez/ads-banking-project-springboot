@@ -16,8 +16,16 @@ import banking.persons.domain.repository.PersonRepository;
 @Repository
 public class PersonHibernateRepository extends BaseHibernateRepository<Person> implements PersonRepository {
 	public Person get(long personId) {
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createSQLQuery("select p.person_id, p.first_name, p.last_name, "
+				+ " p.id_number, p.address, p.phone, p.email, p.active " + 
+				"from person p where p.person_id = ?");
+		List<Object[]> rows = query.setLong(0, personId).list();
 		Person person = null;
-		person = getSession().get(Person.class, personId);
+		if(!rows.isEmpty()) {
+			Object[] row = rows.get(0);
+			person = new Person(Long.valueOf(row[0].toString()), (String) row[1], (String) row[2], (String) row[3], (String) row[4], (String) row[5], (String) row[6], (Boolean)row[7]);
+		}
 		return person;
 	}
 	
@@ -40,12 +48,6 @@ public class PersonHibernateRepository extends BaseHibernateRepository<Person> i
 			}
 		}
 		return persons;
-		/*List<Person> persons = null;
-		Criteria criteria = getSession().createCriteria(Person.class);
-		criteria.setFirstResult(page);
-		criteria.setMaxResults(pageSize);
-		persons = criteria.list();
-		return persons;*/
 	}
 	
 	public Person save(Person person) {

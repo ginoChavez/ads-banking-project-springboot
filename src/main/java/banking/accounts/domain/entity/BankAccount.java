@@ -10,6 +10,7 @@ public class BankAccount {
     private String number;
     private BigDecimal balance;
     private boolean isLocked;
+    private BigDecimal overdraft;
     private Person person;
 
     public BankAccount() {
@@ -17,11 +18,13 @@ public class BankAccount {
     
     
 
-    public BankAccount(long id, String number, BigDecimal balance) {
+    public BankAccount(long id, String number, BigDecimal balance, Boolean isLocked, BigDecimal overdraft) {
 		super();
 		this.id = id;
 		this.number = number;
 		this.balance = balance;
+		this.isLocked = isLocked;
+		this.overdraft = overdraft;
 	}
 
 	public void lock() {
@@ -142,6 +145,14 @@ public class BankAccount {
     public void setPerson(Person person) {
         this.person = person;
     }
+
+	public BigDecimal getOverdraft() {
+		return overdraft;
+	}
+
+	public void setOverdraft(BigDecimal overdraft) {
+		this.overdraft = overdraft;
+	}
     
 
 }

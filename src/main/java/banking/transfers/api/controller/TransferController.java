@@ -15,7 +15,7 @@ import banking.transfers.application.TransferApplicationService;
 import banking.transfers.application.dto.TransferDto;
 
 @RestController
-@RequestMapping("api/transfers")
+@RequestMapping("api/transactions")
 public class TransferController {
 	
 	@Autowired

@@ -9,6 +9,7 @@ public class BankAccountDto {
 	private String number;
 	private BigDecimal balance;
 	private boolean isLocked;
+	private BigDecimal overdraft;
 	private PersonDto person;
 
 	public long getId() {
@@ -49,6 +50,14 @@ public class BankAccountDto {
 
 	public void setPerson(PersonDto person) {
 		this.person = person;
+	}
+
+	public BigDecimal getOverdraft() {
+		return overdraft;
+	}
+
+	public void setOverdraft(BigDecimal overdraft) {
+		this.overdraft = overdraft;
 	}
 	
 }

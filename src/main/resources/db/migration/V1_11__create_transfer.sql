@@ -4,6 +4,7 @@ CREATE TABLE transfer(
     number_account_origin VARCHAR(50),
 	number_account_destiny VARCHAR(50),
     amount DECIMAL(10,2) NOT NULL,
+    operation_number VARCHAR(15),
     date_registry DATE NOT NULL,
     transfer_type VARCHAR(2) NOT NULL,
 	PRIMARY KEY (transfer_id),

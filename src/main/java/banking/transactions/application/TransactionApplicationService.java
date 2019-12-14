@@ -63,7 +63,7 @@ public class TransactionApplicationService {
 			if(!isAccountDestinityEmpty) {
 				bankAccount = bankAccountRepository.findByNumber(requestBankTransferDto.getToAccountNumber());
 				if(bankAccount!=null) {
-					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), requestBankTransferDto.getTransferType());
+					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), true);
 					this.bankAccountRepository.update(bankAccount);
 					
 					transfer.setNumberAccountDestiny(bankAccount.getNumber());
@@ -72,7 +72,15 @@ public class TransactionApplicationService {
 					transfer.setAmount(requestBankTransferDto.getAmount());
 					transfer.setDateRegistry(new Date());
 					transferRepository.save(transfer);
-					
+					GestionDeCorreo.enviarCorreo(
+							MensajeEmail.mensajeDeTransferencia(
+									transfer.getPerson().getEmail(),
+									requestBankTransferDto.getFromAccountNumber(), 
+									requestBankTransferDto.getToAccountNumber(),
+									transfer.getAmount(),
+									transfer.getPerson().getFirstName(),
+									transfer.getDateRegistry())
+							);
 					
 				}else {
 					throw new IllegalArgumentException("The destinity account number doesn't exist!");
@@ -84,7 +92,7 @@ public class TransactionApplicationService {
 			if(!isAccountOriginEmpty) {
 				bankAccount = bankAccountRepository.findByNumber(requestBankTransferDto.getFromAccountNumber());
 				if(bankAccount!=null) {
-					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), requestBankTransferDto.getTransferType());
+					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), false);
 					this.bankAccountRepository.update(bankAccount);
 					
 					transfer.setNumberAccountOrigin(bankAccount.getNumber());
@@ -101,55 +109,47 @@ public class TransactionApplicationService {
 			}
 		} else if(Objects.equals(requestBankTransferDto.getTransferType(), "TC")
 				||Objects.equals(requestBankTransferDto.getTransferType(), "TT")) {
-			String transactionType = "";
 			if(!isAccountDestinityEmpty&&!isAccountOriginEmpty) {
 				//Registro de movimiento de deposito para la cuenta Destino.
-				String numeroCuentaOrigen=null;
-				String numeroCuentaDestino=null;
-				
-				
-				transactionType = "D";
+				String operationNumber = getRandom(5l);
 				bankAccount = bankAccountRepository.findByNumber(requestBankTransferDto.getToAccountNumber());
 				if(bankAccount!=null) {
-					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), transactionType);
+					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), true);
 					this.bankAccountRepository.update(bankAccount);
 					transfer = new Transfer();
 					transfer.setNumberAccountDestiny(bankAccount.getNumber());
 					transfer.setPerson(bankAccount.getPerson());
-					transfer.setTransferType(transactionType);
+					transfer.setTransferType(requestBankTransferDto.getTransferType());
 					transfer.setAmount(requestBankTransferDto.getAmount());
 					transfer.setDateRegistry(new Date());
+					transfer.setOperationNumber(operationNumber);
 					transferRepository.save(transfer);
-					numeroCuentaDestino = transfer.getNumberAccountDestiny();
+					GestionDeCorreo.enviarCorreo(
+							MensajeEmail.mensajeDeTransferencia(
+									transfer.getPerson().getEmail(),
+									requestBankTransferDto.getFromAccountNumber(), 
+									requestBankTransferDto.getToAccountNumber(),
+									transfer.getAmount(),
+									transfer.getPerson().getFirstName(),
+									transfer.getDateRegistry())
+							);
 				}else {
 					throw new IllegalArgumentException("The destination account number doesn't exist!");
 				}
 				
 				//Registro de movimiento de retiro para la cuenta Origen.
-				transactionType = "R";
 				bankAccount = bankAccountRepository.findByNumber(requestBankTransferDto.getFromAccountNumber());
 				if(bankAccount!=null) {
-					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), transactionType);
+					this.transferDomainService.performTransferByType(bankAccount, requestBankTransferDto.getAmount(), false);
 					this.bankAccountRepository.update(bankAccount);
 					transfer = new Transfer();
 					transfer.setNumberAccountOrigin(bankAccount.getNumber());
 					transfer.setPerson(bankAccount.getPerson());
-					transfer.setTransferType(transactionType);
+					transfer.setTransferType(requestBankTransferDto.getTransferType());
 					transfer.setAmount(requestBankTransferDto.getAmount());
 					transfer.setDateRegistry(new Date());
+					transfer.setOperationNumber(operationNumber);
 					transferRepository.save(transfer);
-					numeroCuentaOrigen=transfer.getNumberAccountOrigin();
-					
-					
-					GestionDeCorreo.enviarCorreo(
-							MensajeEmail.mensajeDeTransferencia(
-									transfer.getPerson().getEmail(),
-									numeroCuentaOrigen, 
-									numeroCuentaDestino, 
-									transfer.getAmount(),
-									transfer.getPerson().getFirstName(),
-									transfer.getDateRegistry())
-							);
 				}else {
 					throw new IllegalArgumentException("The origin account number doesn't exist!");
 				}
@@ -168,5 +168,11 @@ public class TransactionApplicationService {
 			notification.addError("Invalid JSON data in request body.");
 		}
 		return notification;
+	}
+	
+	public String getRandom(long idTransfer) {
+		String a = String.valueOf(Math.random() * 9 + 0);
+		String b = String.valueOf(idTransfer)+a.substring(2, a.length());
+		return b.substring(0, 8);
 	}
 }

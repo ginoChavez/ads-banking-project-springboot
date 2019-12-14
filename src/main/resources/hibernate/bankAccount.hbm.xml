@@ -9,6 +9,7 @@
         </id>
         <property name="number" column="number" />
         <property name="balance" column="balance" />
+        <property name="overdraft" column="overdraft" />
         <property name="isLocked" column="locked" />
         <many-to-one name="person" class="banking.persons.domain.entity.Person" column="person_id" not-null="true"/>
     </class> 

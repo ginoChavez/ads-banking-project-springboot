@@ -13,6 +13,7 @@ public class TransferDto {
 	private Date dateRegistry;
 	private BigDecimal amount;
 	private String transferType;
+	private String operationNumber;
 	private PersonDto person;
 	
 	
@@ -57,6 +58,12 @@ public class TransferDto {
 	}
 	public void setPerson(PersonDto person) {
 		this.person = person;
+	}
+	public String getOperationNumber() {
+		return operationNumber;
+	}
+	public void setOperationNumber(String operationNumber) {
+		this.operationNumber = operationNumber;
 	}
 	
 	

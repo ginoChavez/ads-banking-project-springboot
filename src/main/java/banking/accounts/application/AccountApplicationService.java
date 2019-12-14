@@ -1,5 +1,6 @@
 package banking.accounts.application;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -33,6 +34,8 @@ public class AccountApplicationService {
             throw new IllegalArgumentException(notification.errorMessage());
         }
 		BankAccount bankAccount = mapper.map(bankAccountDto, BankAccount.class);
+		bankAccount.setBalance(new BigDecimal(0));
+		bankAccount.setOverdraft(new BigDecimal(100.0));
 		bankAccount.setIsLocked(false);
 		Person person = personRepository.get(personId);
 		bankAccount.setPerson(person);
@@ -59,5 +62,25 @@ public class AccountApplicationService {
 		List<BankAccount> bankAccounts = this.bankAccountRepository.get(personId);
 		List<BankAccountDto> bankAccountsDto = modelMapper.map(bankAccounts, new TypeToken<List<BankAccountDto>>() {}.getType());
         return bankAccountsDto;
+    }
+	
+	public List<BankAccountDto> getPaginated(int page, int pageSize, long personId) {
+		ModelMapper modelMapper = new ModelMapper();
+		modelMapper.getConfiguration()
+	      .setFieldMatchingEnabled(true)
+	      .setFieldAccessLevel(AccessLevel.PRIVATE)
+	      .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR);
+		List<BankAccount> bankAccounts = this.bankAccountRepository.getPaginated(page, pageSize, personId);
+		List<BankAccountDto> bankAccountsDto = modelMapper.map(bankAccounts, new TypeToken<List<BankAccountDto>>() {}.getType());
+        return bankAccountsDto;
+    }
+	
+	public BankAccountDto locked(BankAccountDto bankAccountDto) throws Exception {
+		//BankAccount bankAccount = mapper.map(bankAccountDto, BankAccount.class);
+		BankAccount bankAccount = bankAccountRepository.findByNumber(bankAccountDto.getNumber());
+		bankAccount.setIsLocked(true);
+		bankAccount = bankAccountRepository.update(bankAccount);
+		bankAccountDto = mapper.map(bankAccount, BankAccountDto.class);
+        return bankAccountDto;
     }
 }

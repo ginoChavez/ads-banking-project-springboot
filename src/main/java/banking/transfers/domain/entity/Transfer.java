@@ -13,6 +13,7 @@ public class Transfer {
 	private Date dateRegistry;
 	private BigDecimal amount;
 	private String transferType;
+	private String operationNumber;
 	private Person person;
 	
 	public Transfer() {
@@ -72,6 +73,14 @@ public class Transfer {
 
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	public String getOperationNumber() {
+		return operationNumber;
+	}
+
+	public void setOperationNumber(String operationNumber) {
+		this.operationNumber = operationNumber;
 	}
 
 	

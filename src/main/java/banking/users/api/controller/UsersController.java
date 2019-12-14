@@ -30,7 +30,7 @@ public class UsersController {
 	public ResponseEntity<Object> create(@RequestBody UserDto userDto) throws Exception {
         try {
         	userDto = userApplicationService.create(userDto);
-        	return this.responseHandler.getResponse("User Registered!", HttpStatus.CREATED);
+        	return this.responseHandler.getResponse("Registered user successfully!", HttpStatus.CREATED);
         } catch(IllegalArgumentException ex) {
 			return this.responseHandler.getAppCustomErrorResponse(ex.getMessage());
 		} catch(Exception ex) {
@@ -73,8 +73,24 @@ public class UsersController {
 	@RequestMapping(method = RequestMethod.GET, path = "/{userId}", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<Object> get(@PathVariable("userId") long userId) throws Exception {
 		try {
-			UserDto userDto = userApplicationService.get(userId);
+			UserDto userDto = userApplicationService.getById(userId);
 			return new ResponseEntity<Object>(userDto, HttpStatus.OK);
+		} catch(IllegalArgumentException ex) {
+			return this.responseHandler.getAppCustomErrorResponse(ex.getMessage());
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			return this.responseHandler.getAppExceptionResponse();
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "byname/{userName}", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<Object> get(@PathVariable("userName") String userName) throws Exception {
+		try {
+			UserDto userDto = userApplicationService.getByName(userName);
+			if (userDto!=null) {
+				return new ResponseEntity<Object>(userDto, HttpStatus.OK);
+			}
+			return this.responseHandler.getResponse("Unregistered user!", HttpStatus.NOT_FOUND);
 		} catch(IllegalArgumentException ex) {
 			return this.responseHandler.getAppCustomErrorResponse(ex.getMessage());
 		} catch(Exception ex) {

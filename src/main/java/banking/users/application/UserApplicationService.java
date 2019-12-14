@@ -13,9 +13,9 @@ import banking.common.application.Notification;
 import banking.common.application.enumeration.RequestBodyType;
 import banking.common.infrastructure.security.Hashing;
 import banking.common.infrastructure.security.JwtTokenProvider;
-import banking.persons.domain.entity.Person;
 import banking.persons.domain.repository.PersonRepository;
 import banking.roles.application.dto.RoleClaimDto;
+import banking.roles.application.dto.RoleDto;
 import banking.roles.domain.entity.RoleClaim;
 import banking.roles.domain.repository.RoleClaimRepository;
 import banking.roles.domain.repository.RoleRepository;
@@ -43,6 +43,7 @@ public class UserApplicationService {
 	
 	@Autowired
 	private JwtTokenProvider jwtTokenProvider;
+	
 	
 	@Value("${maxPageSize}")
 	private int maxPageSize;
@@ -96,16 +97,25 @@ public class UserApplicationService {
 		userAuthDto.setBearerToken(new UUID(0L, 0L).toString());
 		List<RoleClaim> claims = roleClaimRepository.findByRoleId(authUser.getRole().getId());
 		List<RoleClaimDto> claimsDto = mapper.map(claims, new TypeToken<List<RoleClaimDto>>() {}.getType());
+		RoleDto role = mapper.map(authUser.getRole(), RoleDto.class);
+		userAuthDto.setRole(role);
 		userAuthDto.setClaims(claimsDto);
 		userAuthDto.setBearerToken(jwtTokenProvider.buildJwtToken(userAuthDto));
 		return userAuthDto;
 	}
 	
-	public UserDto get(long userId) {
+	public UserDto getById(long userId) {
 		ModelMapper modelMapper = new ModelMapper();
 		User user = this.userRepository.getById(userId);
 		UserDto userDto = modelMapper.map(user, UserDto.class);
         return userDto;
+    }
+	
+	public UserDto getByName(String userName) {
+		ModelMapper modelMapper = new ModelMapper();
+		User user = this.userRepository.getByName(userName);
+		if(user!=null) return modelMapper.map(user, UserDto.class);
+        return null;
     }
     
     public List<UserDto> getPaginated(int page, int pageSize) {

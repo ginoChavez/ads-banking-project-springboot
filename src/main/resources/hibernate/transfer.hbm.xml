@@ -11,6 +11,7 @@
         <property name="numberAccountDestiny" column="number_account_destiny" />
         <property name="dateRegistry" column="date_registry" />
         <property name="amount" column="amount" />
+        <property name="operationNumber" column="operation_number" />
         <property name="transferType" column="transfer_type" />
         <many-to-one name="person" class="banking.persons.domain.entity.Person" column="person_id" not-null="true"/>
     </class> 

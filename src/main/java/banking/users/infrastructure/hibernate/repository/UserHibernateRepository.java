@@ -49,11 +49,27 @@ public class UserHibernateRepository extends BaseHibernateRepository<User> imple
 	
 	public User getByName(String name) {
 		User user = null;
-		Criteria criteria = getSession().createCriteria(User.class, "u");
-		criteria.createAlias("u.role","r",JoinType.INNER_JOIN);
-		criteria.createAlias("r.claims", "c", JoinType.LEFT_OUTER_JOIN);
-		criteria.add(Restrictions.eq("u.name", name));
-		user = (User) criteria.uniqueResult();
+		Session session = sessionFactory.getCurrentSession();
+		Query query = session.createSQLQuery("select u.user_id, u.user_name, u.password, r.role_id, r.role_name, p.person_id, p.first_name, p.last_name, "
+				+ " p.id_number, p.address, p.phone, p.email, p.active " + 
+				"from user u " + 
+				"left join person p on u.person_id = p.person_id " + 
+				"inner join role r on u.role_id=r.role_id "
+				+ "where u.user_name = ?");
+		List<Object[]> rows = query.setString(0, name).list();
+		//User user = null;
+		if(!rows.isEmpty()) {
+			Role role = null;
+			Person person = null;
+			Object[] row = rows.get(0);
+			user = new User(Long.valueOf(row[0].toString()), (String) row[1], (String) row[2]);
+			role = new Role(Long.valueOf(row[3].toString()), (String) row[4]);
+			if(row[5]!=null) {
+				person = new Person(Long.valueOf(row[5].toString()), (String) row[6], (String) row[7], (String) row[8], (String) row[9], (String) row[10], (String) row[11], (Boolean)row[12]);
+			}
+			user.setPerson(person);
+			user.setRole(role);
+		}
 		return user;
 	}
 	
