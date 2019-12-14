@@ -28,7 +28,7 @@ public class BankAccountHibernateRepository extends BaseHibernateRepository<Bank
 		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
 				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
 				"from bank_account a " + 
-				"inner join person p on a.person_id = a.person_id "
+				"inner join person p on p.person_id = a.person_id "
 				+ "where a.number = ?");
 		List<Object[]> rows = query.setString(0, accountNumber).list();
 		if(!rows.isEmpty()) {
@@ -59,7 +59,7 @@ public class BankAccountHibernateRepository extends BaseHibernateRepository<Bank
 		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
 				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
 				"from bank_account a " + 
-				"inner join person p on a.person_id = a.person_id "
+				"inner join person p on p.person_id = a.person_id "
 				+ "where p.person_id = ?");
 		List<Object[]> rows = query.setLong(0, personId).list();
 		BankAccount bankAccount = null;
@@ -77,17 +77,27 @@ public class BankAccountHibernateRepository extends BaseHibernateRepository<Bank
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<BankAccount> getPaginated(int page, int pageSize,long personId) {
+	public List<BankAccount> getPaginated(int page, int pageSize,Long personId) {
 		List<BankAccount> bankAccounts = new ArrayList<BankAccount>();
 		Session session = sessionFactory.getCurrentSession();
-		Query query = session.createSQLQuery("select a.bank_account_id, a.number, a.balance,  "
+		String q = "select a.bank_account_id, a.number, a.balance,  "
 				+ "p.person_id, p.first_name, p.last_name, p.id_number, p.address, p.phone, p.email, p.active, a.locked, a.overdraft " + 
 				"from bank_account a " + 
-				"inner join person p on a.person_id = a.person_id "
-				+ "where p.person_id = ?");
+				"inner join person p on p.person_id = a.person_id ";
+		if(personId!=null) {
+			q+= " where p.person_id = ?";
+		}
+				
+		Query query = session.createSQLQuery(q);
 		query.setFirstResult(page);
 		query.setMaxResults(pageSize);
-		List<Object[]> rows = query.setLong(0, personId).list();
+		List<Object[]> rows = null;
+		if(personId!=null) {
+			rows = query.setLong(0, personId).list();
+		}else {
+			rows = query.list();
+		}
+		
 		BankAccount bankAccount = null;
 		if(!rows.isEmpty()) {
 			for(Object[] row: rows) {

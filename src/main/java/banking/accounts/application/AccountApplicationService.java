@@ -64,7 +64,7 @@ public class AccountApplicationService {
         return bankAccountsDto;
     }
 	
-	public List<BankAccountDto> getPaginated(int page, int pageSize, long personId) {
+	public List<BankAccountDto> getPaginated(int page, int pageSize, Long personId) {
 		ModelMapper modelMapper = new ModelMapper();
 		modelMapper.getConfiguration()
 	      .setFieldMatchingEnabled(true)

@@ -38,5 +38,20 @@ public class TransferController {
 			return this.responseHandler.getAppExceptionResponse();
 		}
 	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/all", produces = "application/json; charset=UTF-8")
+	public ResponseEntity<Object> getAll(
+			@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+    		@RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) throws Exception {
+		try {
+			List<TransferDto> transfers = transferApplicationService.getPaginated(page, pageSize);
+			return new ResponseEntity<Object>(transfers, HttpStatus.OK);
+		} catch(IllegalArgumentException ex) {
+			return this.responseHandler.getAppCustomErrorResponse(ex.getMessage());
+		} catch(Exception ex) {
+			ex.printStackTrace();
+			return this.responseHandler.getAppExceptionResponse();
+		}
+	}
 
 }

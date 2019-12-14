@@ -61,7 +61,7 @@ public class GestionDeCorreo {
 	      message.setContent(cuerpoDelMensaje,"text/html;charset=UTF-8");
 	
 	      // Send message
-	      //Transport.send(message);
+	      Transport.send(message);
 	
 	      //System.out.println("Sent message successfully....");
 

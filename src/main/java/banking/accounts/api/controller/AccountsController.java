@@ -58,7 +58,7 @@ public class AccountsController {
     ResponseEntity<Object> getPaginated(
     		@RequestParam(value = "page", required = false, defaultValue = "0") int page,
     		@RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize,
-    		@RequestParam("personId") long personId) {
+    		@RequestParam(value = "personId", required = false, defaultValue = "") Long personId) {
         try {
             List<BankAccountDto> persons = accountApplicationService.getPaginated(page, pageSize, personId);
             return this.responseHandler.getDataResponse(persons, HttpStatus.OK);
