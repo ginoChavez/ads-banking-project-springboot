@@ -1,8 +1,10 @@
 package banking.transfers.api.controller;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,9 +44,14 @@ public class TransferController {
 	@RequestMapping(method = RequestMethod.GET, path = "/all", produces = "application/json; charset=UTF-8")
 	public ResponseEntity<Object> getAll(
 			@RequestParam(value = "page", required = false, defaultValue = "0") int page,
-    		@RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize) throws Exception {
+    		@RequestParam(value = "pageSize", required = false, defaultValue = "100") int pageSize,
+    		@RequestParam(value = "personaId", required = false, defaultValue = "") Long personaId,
+    		@RequestParam(value = "account", required = false, defaultValue = "") String account,
+    		@DateTimeFormat(pattern="yyyy-MM-dd") Date initDate,
+    		@DateTimeFormat(pattern="yyyy-MM-dd") Date endDate
+    		) throws Exception {
 		try {
-			List<TransferDto> transfers = transferApplicationService.getPaginated(page, pageSize);
+			List<TransferDto> transfers = transferApplicationService.getAll(page, pageSize, personaId, account, initDate, endDate);
 			return new ResponseEntity<Object>(transfers, HttpStatus.OK);
 		} catch(IllegalArgumentException ex) {
 			return this.responseHandler.getAppCustomErrorResponse(ex.getMessage());

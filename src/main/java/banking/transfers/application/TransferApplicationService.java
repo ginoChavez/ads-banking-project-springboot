@@ -1,6 +1,6 @@
 package banking.transfers.application;
 
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -9,14 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import banking.accounts.application.dto.BankAccountDto;
-import banking.accounts.domain.entity.BankAccount;
 import banking.common.application.Notification;
-import banking.persons.domain.repository.PersonRepository;
 import banking.transfers.application.dto.TransferDto;
 import banking.transfers.domain.entity.Transfer;
 import banking.transfers.domain.repository.TransferRepository;
-import banking.users.application.dto.UserDto;
 
 @Service
 public class TransferApplicationService {
@@ -49,6 +45,16 @@ public class TransferApplicationService {
             throw new IllegalArgumentException(notification.errorMessage());
         }
 		List<Transfer> transfers = this.transferRepository.getPaginated(page, pageSize);
+		List<TransferDto> transfersDto = mapper.map(transfers, new TypeToken<List<TransferDto>>() {}.getType());
+        return transfersDto;
+    }
+	
+	public List<TransferDto> getAll(int page, int pageSize, Long personaId, String account, Date initDate, Date endDate) {
+		Notification notification = this.getPaginatedValidation(page, pageSize);
+        if (notification.hasErrors()) {
+            throw new IllegalArgumentException(notification.errorMessage());
+        }
+		List<Transfer> transfers = this.transferRepository.getAll(page, pageSize, personaId, account, initDate, endDate);
 		List<TransferDto> transfersDto = mapper.map(transfers, new TypeToken<List<TransferDto>>() {}.getType());
         return transfersDto;
     }
